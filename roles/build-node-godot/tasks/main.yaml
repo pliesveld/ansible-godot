@@ -98,8 +98,7 @@
     shell:
       cmd: |
          cd /usr/src/godot/
-         scons -j4 arch=arm platform=x11 tools=no target=debug bits=32 use_llvm=yes use_lld=yes
-#      scons -j4 platform=server tools=yes target=debug bits=32 use_llvm=yes use_lld=yes
+         scons platform=x11 target=debug tools=yes use_llvm=yes CCFLAGS="-g -ggdb -fno-omit-frame-pointer -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mlittle-endian -munaligned-access" -j 4
 
 
 
