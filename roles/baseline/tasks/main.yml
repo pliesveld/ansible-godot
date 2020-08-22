@@ -1,0 +1,18 @@
+---
+- name: Install espeak
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - espeak
+    - screen
+    - pulseaudio
+    - ntp
+    - vim
+    - software-properties-common
+- name: Defaulting groups for user pi
+  user:
+    name: pi
+    state: present
+    groups: 'staff,audio,dialout,cdrom,games,users,netdev,spi,i2c,gpio,video,plugdev,pulse,pulse-access'
+

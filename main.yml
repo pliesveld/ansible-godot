@@ -1,0 +1,26 @@
+---
+# Playbook for installing and configuring the base systems of the rasberry pis
+# - hosts: all
+#   strategy: free
+#   remote_user: root
+#   roles:
+#      - pulseaudio
+
+# - hosts: localhost
+#   strategy: free
+#   become: yes
+#   remote_user: root
+#   roles:
+#      - rsyslog-server
+
+- hosts: bigpi4
+  strategy: free
+  become: yes
+  remote_user: pi
+  roles:
+     - baseline 
+#    - rsyslog-client
+     - build-node-godot
+
+
+

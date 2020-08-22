@@ -1,0 +1,9 @@
+# Example playbook to test ansible for deployments
+
+- hosts: all
+  strategy: free
+  become: yes
+  remote_user: pi
+  roles:
+  - role: baseline
+

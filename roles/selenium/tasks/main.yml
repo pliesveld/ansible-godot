@@ -1,0 +1,76 @@
+---
+- name: install latest firefox
+  apt:
+    name: firefox-esr
+    state: latest
+    cache_valid_time: 604800 # 1 week
+
+- name: install X11 fame-buffer
+  apt:
+    name: xvfb
+    state: latest
+    cache_valid_time: 604800 # 1 week
+
+-  name: update firefox to latest
+   command: "apt-get --only-upgrade install"
+
+-  name: check firefox version
+   command: "firefox --version"
+   register: firefox
+-  debug: var=firefox.stdout_lines
+
+-  name: download geckodriver
+   get_url: # TODO: make this a variable
+     url: https://github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz
+     dest: /tmp/geckodriver-v0.17.0-arm7hf.tar.gz
+
+-  name: extract geckodriver
+   unarchive:
+     src: /tmp/geckodriver-v0.17.0-arm7hf.tar.gz
+     remote_src: true
+     dest: /usr/local/bin/
+
+-  name: remove temporary file
+   file:
+     path: /tmp/geckodriver-v0.17.0-arm7hf.tar.gz
+     state: absent
+
+- name: install selenium
+  pip: ## TODO: use requirements
+    executable: pip3
+    name: selenium
+
+- name: install PyVirtualDisplay
+  pip: ## TODO: use requirements
+    executable: pip3
+    name: PyVirtualDisplay
+
+- name: install xvfbwrapper
+  pip: ## TODO: use requirements
+    executable: pip3
+    name: xvfbwrapper
+
+- name: copy over selenium test
+  copy:
+    src: selenium-test.py
+    dest: /tmp/selenium-test.py
+
+- name: remove previous screenshot
+  file:
+    path: /tmp/screenshot.png
+    state: absent
+
+- name: execute selenium test
+  command: python3 /tmp/selenium-test.py
+  args:
+    chdir: /tmp/
+  register: selenium
+- debug: var=selenium.stdout_lines
+- debug: var=selenium.stderr_lines # TODO: check for errors
+
+- name: fetch screenshot
+  fetch:
+    fail_on_missing: true
+    src: /tmp/screenshot.png
+    dest: /tmp/ # TODO: make folder to save these
+

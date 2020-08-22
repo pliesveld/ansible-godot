@@ -1,0 +1,40 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Install base packages
+    apt:
+      name: "{{ packages }}"
+    vars:
+      packages:
+      - git
+      - vim
+
+- hosts: all
+  become: yes
+  tasks:
+  - name: Install godot dependencies
+    apt:
+      name: "{{ packages }}"
+    vars:
+      packages:
+      - build-essential
+      - scons
+      - pkg-config
+      - libx11-dev
+      - libxcursor-dev
+      - libxinerama-dev
+      - libgl1-mesa-dev
+      - libglu-dev
+      - libasound2-dev
+      - libpulse-dev
+      - libfreetype6-dev
+      - libudev-dev
+      - libxi-dev
+      - libxrandr-dev
+      - yasm
+      - linux-source
+      - libclang-7-dev
+      - libclang1-7
+      - lldb-7
+

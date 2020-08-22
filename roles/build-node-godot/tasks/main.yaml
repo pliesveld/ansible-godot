@@ -1,0 +1,107 @@
+---
+#  - name: Install build dependencies
+#    apt:
+#      name: "{{ packages }}"
+#    vars:
+#      packages:
+#      - build-essential
+#      - pkg-config
+#      - linux-source
+#
+#  - name: Install clang 7 
+#    apt:
+#      name: "{{ packages }}"
+#    vars:
+#      packages:
+#      - clang-7
+#      - libclang-7-dev
+#      - libclang1-7
+#      - lldb-7
+#      - lld-7
+#      - libasound2
+#
+
+  - name: Update alternatives to use clang 7
+    alternatives:
+      name: "{{ item }}"
+      link: "/usr/bin/{{ item }}"
+      path: "/usr/bin/{{ item }}-7"
+    with_items:
+    - clang
+    - clang++
+    - lld
+    - lld-link
+    - lldb
+    - lldb-server
+    - lldb-test
+    - lldb-mi
+    - lldb-argdumper
+    
+
+
+#  - name: Install godot dependencies
+#    apt:
+#      name: "{{ packages }}"
+#    vars:
+#      packages:
+#      - scons
+#      - libx11-dev
+#      - libxcursor-dev
+#      - libxinerama-dev
+#      - libgl1-mesa-dev
+#      - libglu-dev
+#      - libasound2-dev
+#      - libpulse-dev
+#      - libfreetype6-dev
+#      - libudev-dev
+#      - libxi-dev
+#      - libxrandr-dev
+#      - yasm
+#
+  - name: Install flamegraph dependencies
+    apt:
+      name: "{{ packages }}"
+    vars:
+      packages:
+      - linux-perf
+      - libopencsd0
+#
+# root@bigpi4:~# perf
+# /usr/bin/perf: line 13: exec: perf_4.19: not found
+# E: linux-perf-4.19 is not installed.
+
+# wget http://http.us.debian.org/debian/pool/main/l/linux/linux-perf-4.19_4.19.132-1_armhf.deb 
+# dpkg -i linux-perf-4.19_4.19.132-1_armhf.deb
+
+#
+#
+#  - name: Install documentation dependencies
+#    apt:
+#      name: "{{ packages }}"
+#    vars:
+#      packages:
+#      - graphviz
+#      - doxygen
+##      - drawio
+#
+#  - name: Verify godot dependencies
+#    script: verify_installation.sh
+#      
+#  - name: Git clone Godot source
+#    git:
+#        repo: https://github.com/godotengine/godot.git
+#        version: 3.1
+#        recursive: yes
+#        dest: /usr/src/godot
+#    
+  - name: Compile godot
+    shell:
+      cmd: |
+         cd /usr/src/godot/
+         scons -j4 arch=arm platform=x11 tools=no target=debug bits=32 use_llvm=yes use_lld=yes
+#      scons -j4 platform=server tools=yes target=debug bits=32 use_llvm=yes use_lld=yes
+
+
+
+
+

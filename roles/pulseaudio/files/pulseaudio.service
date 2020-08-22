@@ -1,0 +1,16 @@
+[Unit]
+Description=PulseAudio system server
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/pulseaudio --daemonize=no --system --realtime --log-target=journal
+
+# debug options follow:
+#ExecStart=/usr/bin/pulseaudio -vvvv --daemonize=no --system --realtime --log-target=journal --disallow-exit --disable-shm --exit-idle-time=-1
+#StandardOutput=syslog
+#StandardError=syslog
+#SyslogIdentifier=pulseaudio
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,14 @@
+---
+- name: server log folder
+  file:
+    path: /var/log/pis
+    state: directory
+    mode: 0660
+    owner: syslog
+    group: adm
+
+- name: Install remote config
+  copy:
+    src: 30-remote.conf
+    dest: /etc/rsyslog.d/30-remote.conf
+  notify: restart rsyslog

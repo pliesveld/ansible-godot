@@ -1,0 +1,16 @@
+---
+#- name: Install client config
+#  copy:
+#    src: client.conf
+#    dest: /etc/rsyslog.d/50-client.conf
+#  notify: restart rsyslog
+
+- name: Install client config
+  template:
+    src: 50-client.j2
+    dest: /etc/rsyslog.d/50-client.conf
+    owner: root
+    group: adm
+  notify: restart rsyslog
+  tags:
+    - client-config

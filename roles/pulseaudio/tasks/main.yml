@@ -1,0 +1,43 @@
+---
+- name: Disable start-pulseaudio-x11
+  file:
+    path: /usr/bin/start-pulseaudio-x11
+    owner: root
+    group: root
+    mode: 'u=rw,g=r,o=r'
+
+- name: Install pulseaudio systemd service
+  copy:
+    src: pulseaudio.service
+    dest: /etc/systemd/system/pulseaudio.service
+
+- name: systemd daemon reload and stop pulseaudio
+  systemd:
+    name: pulseaudio
+    daemon_reload: true
+    state: stopped
+
+- name: Install pulseaudio server config
+  copy:
+    src: system.pa
+    dest: /etc/pulse/system.pa
+
+- name: Install pulseaudio client config
+  copy:
+    src: client.conf
+    dest: /etc/pulse/client.conf
+
+- name: restart and enable pulseaudio
+  systemd:
+    name: pulseaudio
+    enabled: true
+    state: restarted
+
+- name: Install paman
+  apt:
+    name: paman
+
+- name: play test sound
+  command: aplay /usr/share/sounds/alsa/Noise.wav
+  tags:
+  - test

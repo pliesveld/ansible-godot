@@ -1,0 +1,7 @@
+---
+# Playbook for installing and configuring the base systems of the rasberry pis
+- hosts: all
+  strategy: free
+  remote_user: root
+  roles:
+  - selenium
