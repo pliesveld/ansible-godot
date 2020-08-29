@@ -1,138 +1,24 @@
 ---
-#  - name: Install build dependencies
-#    apt:
-#      name: "{{ packages }}"
-#    vars:
-#      packages:
-#      - build-essential
-#      - pkg-config
-#      - linux-source
-#
-#  - name: Install clang 7 
-#    apt:
-#      name: "{{ packages }}"
-#    vars:
-#      packages:
-#      - clang-7
-#      - libclang-7-dev
-#      - libclang1-7
-#      - lldb-7
-#      - lld-7
-#      - libasound2
-#
 
-  - name: Update alternatives to use clang 7
-    alternatives:
-      name: "{{ item }}"
-      link: "/usr/bin/{{ item }}"
-      path: "/usr/bin/{{ item }}-7"
-    with_items:
-    - clang
-    - clang++
-    - lld
-    - lld-link
-    - lldb
-    - lldb-server
-    - lldb-test
-    - lldb-mi
-    - lldb-argdumper
-    
-
-
-#  - name: Install godot dependencies
-#    apt:
-#      name: "{{ packages }}"
-#    vars:
-#      packages:
-#      - scons
-#      - libx11-dev
-#      - libxcursor-dev
-#      - libxinerama-dev
-#      - libgl1-mesa-dev
-#      - libglu-dev
-#      - libasound2-dev
-#      - libpulse-dev
-#      - libfreetype6-dev
-#      - libudev-dev
-#      - libxi-dev
-#      - libxrandr-dev
-#      - yasm
-#
-
-  - name: Install flamegraph dependencies
+  - name: Install godot dependencies
     apt:
       name: "{{ packages }}"
     vars:
       packages:
-      # - linux-perf-4.19  # may need to compile from source
-      - libopencsd0 
-      - libc++1-9-dbgsym 
-      - libc++abi1-9-dbgsym
-      - raspberrypi-kernel # may not install version matching running kernel
-      - raspberrypi-kernel-headers # may not install version matching
-      - flex # for compiling perf
-      - bison # for compiling perf
-      - libunwind-dev # needs to be installed compiling perf
-      - libunwind8 # for viewing perf reports
-      - libdw-dev # needs to be installed compiling perf
-      - libdw1 # # needs to be installed compiling perf
+        - scons
+        - libx11-dev
+        - libxcursor-dev
+        - libxinerama-dev
+        - libgl1-mesa-dev
+        - libglu-dev
+        - libasound2-dev
+        - libpulse-dev
+        - libfreetype6-dev
+        - libudev-dev
+        - libxi-dev
+        - libxrandr-dev
+        - yasm
 
-
-
-# 
-  # - name: Install linux headers
-  #   package:
-  #     name: "linux-headers-{{ ansible_kernel }}"
-
-## TODO: print kernel version, . and use it in version below
-
-
-  - name: Install linux headers for raspberrypi
-    git:
-      repo: https://github.com/raspberrypi/linux.git
-      version: rpi-4.19.y
-      recursive: yes
-      depth: 1
-      dest: /usr/src/linux-headers-raspberrypi
-
-  - name: Compile perf
-    shell:
-      cmd: |
-         cd /usr/src/linux-headers-raspberrypi/tools/perf/
-         make clean 
-         make
-         cp perf /usr/bin/perf
-      
-
-# root@bigpi4:~# perf
-# /usr/bin/perf: line 13: exec: perf_4.19: not found
-# E: linux-perf-4.19 is not installed.
-
-# wget http://http.us.debian.org/debian/pool/main/l/linux/linux-perf-4.19_4.19.132-1_armhf.deb 
-# dpkg -i linux-perf-4.19_4.19.132-1_armhf.deb
-
-  - name: Install flamegraph
-    git:
-      repo: https://github.com/brendangregg/FlameGraph.git
-      version: master
-      recursive: yes
-      dest: /usr/src/FlameGraph
-
-
-
-
-#  - name: Install documentation dependencies
-#    apt:
-#      name: "{{ packages }}"
-#    vars:
-#      packages:
-#      - graphviz
-#      - doxygen
-# #      - drawio
-
- # - name: Verify godot dependencies
- #   script: verify_installation.sh
-     
  # - name: Git clone Godot source
  #   git:
  #       repo: https://github.com/godotengine/godot.git
@@ -140,11 +26,11 @@
  #       recursive: yes
  #       dest: /usr/src/godot
    
-  # - name: Compile godot
-  #   shell:
-  #     cmd: |
-  #        cd /usr/src/godot/
-  #        scons platform=x11 target=debug tools=yes use_llvm=yes CCFLAGS="-g -ggdb -fno-omit-frame-pointer -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mlittle-endian -munaligned-access" -j 4
+ #  - name: Compile godot
+ #    shell:
+ #      cmd: |
+ #         cd /usr/src/godot/
+ #         scons platform=x11 target=debug tools=yes use_llvm=yes CCFLAGS="-g -ggdb -fno-omit-frame-pointer -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mlittle-endian -munaligned-access" -j 4
 
 
 

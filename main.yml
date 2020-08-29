@@ -18,9 +18,9 @@
   become: yes
   remote_user: pi
   roles:
-     - baseline 
-#    - rsyslog-client
-     - build-node-godot
-
-
+  - baseline 
+  - build-node-clang
+  - build-node-perf-flamegraph
+  - build-node-godot
+  - build-node-documentation-tools
 

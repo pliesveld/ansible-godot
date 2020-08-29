@@ -1,0 +1,12 @@
+---
+
+  - name: Install documentation dependencies
+    apt:
+      name: "{{ packages }}"
+    vars:
+      packages:
+      - graphviz
+      - doxygen
+  #      - drawio
+
+

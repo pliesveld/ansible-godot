@@ -1,0 +1,38 @@
+---
+#  - name: Install build dependencies
+#    apt:
+#      name: "{{ packages }}"
+#    vars:
+#      packages:
+#      - build-essential
+#      - pkg-config
+#
+#  - name: Install clang 7 
+#    apt:
+#      name: "{{ packages }}"
+#    vars:
+#      packages:
+#      - clang-7
+#      - libclang-7-dev
+#      - libclang1-7
+#      - lldb-7
+#      - lld-7
+#      - libasound2
+#
+
+  - name: Update alternatives to use clang 7
+    alternatives:
+      name: "{{ item }}"
+      link: "/usr/bin/{{ item }}"
+      path: "/usr/bin/{{ item }}-7"
+    with_items:
+    - clang
+    - clang++
+    - lld
+    - lld-link
+    - lldb
+    - lldb-server
+    - lldb-test
+    - lldb-mi
+    - lldb-argdumper
+ 

@@ -1,0 +1,133 @@
+---
+   
+
+  - name: Install perf/flamegraph dependencies
+    apt:
+      name: "{{ packages }}"
+    vars:
+      packages:
+      - linux-perf
+      - libopencsd0 
+      - libc++1-9-dbgsym 
+      - libc++abi1-9-dbgsym
+      # - raspberrypi-kernel # may not install version matching running kernel
+      # - raspberrypi-kernel-headers # may not install version matching
+      - flex # for compiling perf
+      - bison # for compiling perf
+      - binutils-dev
+
+      - libdw-dev # needs to be installed when compiling perf
+      - libdw1 # # needs to be installed when compiling perf
+      - libaudit-dev # needs to be installed when compiling perf
+      - libc6-dev 
+      - libgtk2.0-dev
+      - systemtap-sdt-dev
+      - libperl-dev
+
+
+  - name: Remove packaged libunwind
+    apt:
+      name: "{{ packages }}"
+      state: absent
+    vars:
+      packages:
+      - libunwind-dev # uninstall packaged version. to be compiled from source
+      - libunwind8 # uninstall packaged version. to be compiled from source
+
+  
+# 
+  # - name: Install linux headers
+  #   package:
+  #     name: "linux-headers-{{ ansible_kernel }}"
+
+## TODO: print kernel version, . and use it in version below
+
+  - name: Install linux headers for raspberrypi
+    git:
+      repo: https://github.com/raspberrypi/linux.git
+      version: rpi-4.19.y
+      recursive: yes
+      depth: 1
+      dest: /usr/src/linux-headers-raspberrypi
+
+
+  - name: git clone libunwind
+    git:
+      repo: git://git.sv.gnu.org/libunwind.git
+      version: master
+      recursive: yes
+      depth: 1
+      dest: /usr/src/libunwind
+
+
+  - name: Compile libunwind
+    shell:
+      cmd: |
+         cd /usr/src/libunwind
+
+          # https://github.com/libunwind/libunwind/issues/63
+          export UNW_ARM_UNWIND_METHOD=4
+
+          ./autogen.sh
+          export CFLAGS=" -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mlittle-endian -munaligned-access"
+          export CXXFLAGS=" -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mlittle-endian -munaligned-access"
+
+         ./autogen.sh
+         ./configure --enable-setjmp --enable-ptrace --enable-coredump
+         make
+         make install
+         ldconfig # recreate ld.cache
+
+
+  - name: Compile perf
+    shell:
+      cmd: |
+         cd /usr/src/linux-headers-raspberrypi/tools/perf/
+         export CFLAGS="-mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mlittle-endian -munaligned-access"
+
+         make clean 
+         make 
+         cp perf /usr/bin/perf
+
+  # Successful instllation of perf should display call stacks
+  #
+  #  git clone https://github.com/2000nickels/linpackc ; cd linpackc
+  #  gcc -DDP clinpack.c -lm -DROLL -mcpu=cortex-a72 -mfloat-abi=hard -mfpu=neon-fp-armv8 -mneon-for-64bits -fPIC -g -ggdb -fno-omit-frame-pointer -O0
+  #  rm -f perf.data ; perf record -F 50 -g  -d --call-graph dwarf -e instructions  -- ./a.out ; perf report
+  #
+  # Output should have stack traces below, with symbols resolved:
+  #
+  # file a.out 
+  # a.out: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 3.2.0, BuildID[sha1]=3739e448adbb4a4612402b9d5c9fbe9e8ee55cfa, with debug_info, not stripped
+  #
+  #  100.00%     0.00%  a.out    libc-2.28.so       [.] __libc_start_main
+  #           |
+  #           ---__libc_start_main
+  #              main
+  #              |          
+  #              |--92.82%--dgefa
+  #              |          |          
+  #              |          |--85.83%--daxpy
+  #              |          |          
+  #              |          |--1.75%--dscal
+  #              |          |          
+  #              |           --1.31%--idamax
+  #              |          
+  #              |--4.60%--matgen
+  #              |          
+  #               --2.58%--dgesl
+  #                         |          
+  #                          --2.37%--daxpy
+
+
+  - name: Install flamegraph
+    git:
+      repo: https://github.com/brendangregg/FlameGraph.git
+      version: master
+      recursive: yes
+      dest: /usr/src/FlameGrap
+
+ # - name: Verify godot dependencies
+ #   script: verify_installation.sh
+     
+
